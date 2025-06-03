@@ -4,7 +4,7 @@ from scripts import evaluate, process_traits as pt
 import json
 
 def main():
-    CODE_FILE = "example_code3.py"
+    CODE_FILE = "example_code2.py"
     
     with open(f"examples/{CODE_FILE}") as f:
         code = f.read()
@@ -24,27 +24,3 @@ def main():
 
 if __name__=="__main__":
     main()
-    # Example usage
-    # traits = [
-    #     "readability",
-    #     "modularity",
-    #     "simplicity",
-    #     "documentation",
-    #     "style_consistency"
-    # ]
-    # code_file = "examples/example_code3.py"
-    # language = "python"
-    # model = "gpt-4o"  # Change to your desired model
-
-    # # Read code from file
-    # with open(code_file) as f:
-    #     code = f.read()
-
-    # # Evaluate the code
-    # for trait in traits:
-    #     print(f"Evaluating {trait}...")
-    #     result = evaluate.evaluate_code(trait, language, code, model)
-
-    #     # Print the result
-    #     print(f"\n--- {trait.capitalize()} Evaluation ---\n{result}")
-
