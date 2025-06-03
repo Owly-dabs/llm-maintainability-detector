@@ -8,9 +8,12 @@ def main():
     
     with open(f"examples/{CODE_FILE}") as f:
         code = f.read()
+    
+    language = evaluate.detect_language_from_filename(CODE_FILE)
+    print(language)
         
     traits_response = evaluate.evaluate_all_traits(
-        language="python", # TODO: make this dynamic
+        language=language, 
         code=code,
         model="gpt-4o"
     )

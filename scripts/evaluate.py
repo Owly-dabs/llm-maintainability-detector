@@ -8,6 +8,24 @@ from scripts.llm_setup import set_openAI  # Import the function to set up OpenAI
 
 client = set_openAI(local=False)
 
+def detect_language_from_filename(filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return {
+        ".py": "python",
+        ".js": "javascript",
+        ".ts": "typescript",
+        ".java": "java",
+        ".cpp": "cpp",
+        ".c": "c",
+        ".rb": "ruby",
+        ".go": "go",
+        ".rs": "rust",
+        ".cbl": "cobol",
+        ".cob": "cobol",
+        ".vb": "vb.net",
+        ".bas": "vb.net"
+    }.get(ext, "unknown")
+
 def load_prompt_template(path="prompts/single_prompt.txt"):
     with open(path, "r") as f:
         return f.read()
