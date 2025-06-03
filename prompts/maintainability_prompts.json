@@ -1,0 +1,23 @@
+{
+  "readability": {
+    "description": "You are a senior software engineer reviewing the readability of the following code.",
+    "prompt_template": "Rate the readability of the following {language} code on a scale of 1 to 5, using the scale below. Justify your rating in 2-3 sentences.\n\nScoring Scale:\n1 - Very hard to read; poor naming, inconsistent formatting, or unclear logic.\n3 - Somewhat readable; some parts are clear, but naming or structure needs improvement.\n5 - Very easy to read; consistent formatting, clear naming, and well-structured logic.\n\nCODE:\n```{language}\n{code}\n```\n\nReturn your response as a valid JSON object in the following format:\n{{\"trait\": \"{trait}\",\n\"rating\": <1-5 integer>,\n\"justification\": \"<brief explanation>\"\n}}"
+  },
+  "modularity": {
+    "description": "You are a senior software engineer assessing how modular and well-separated the code is.",
+    "prompt_template": "Rate the modularity of the following {language} code on a scale of 1 to 5, using the scale below. Justify your rating in 2–3 sentences.\n\nScoring Scale:\n1 - Monolithic structure; long functions or tight coupling.\n3 - Some modular components, but mixed responsibilities.\n5 - Highly modular; small, single-responsibility functions or classes.\n\nCODE:\n```{language}\n{code}\n```\n\nReturn your response as a valid JSON object in the following format:\n{{\"trait\": \"{trait}\",\n\"rating\": <1-5 integer>,\n\"justification\": \"<brief explanation>\"\n}}"
+  },
+  "simplicity": {
+    "description": "You are a senior software engineer evaluating how simple and straightforward the logic in the code is.",
+    "prompt_template": "Rate the simplicity of the following {language} code on a scale of 1 to 5, using the scale below. Justify your rating in 2–3 sentences.\n\nScoring Scale:\n1 - Highly complex; deeply nested logic or unnecessary tricks.\n3 - Mostly straightforward but with some complexity.\n5 - Very simple and direct; clean logic and no unnecessary complexity.\n\nCODE:\n```{language}\n{code}\n```\n\nReturn your response as a valid JSON object in the following format:\n{{\"trait\": \"{trait}\",\n\"rating\": <1-5 integer>,\n\"justification\": \"<brief explanation>\"\n}}"
+  },
+  "documentation": {
+    "description": "You are a senior software engineer assessing the quality of comments and documentation in the code.",
+    "prompt_template": "Rate the documentation of the following {language} code on a scale of 1 to 5, using the scale below. Justify your rating in 2–3 sentences.\n\nScoring Scale:\n1 - No comments or docstrings; hard to understand intent.\n3 - Some documentation, but missing key areas or unclear.\n5 - Clear docstrings and helpful comments explaining non-obvious logic.\n\nCODE:\n```{language}\n{code}\n```\n\nReturn your response as a valid JSON object in the following format:\n{{\"trait\": \"{trait}\",\n\"rating\": <1-5 integer>,\n\"justification\": \"<brief explanation>\"\n}}"
+  },
+  "style_consistency": {
+    "description": "You are a senior software engineer evaluating the consistency of style, naming, and formatting in the code.",
+    "prompt_template": "Rate the style consistency of the following {language} code on a scale of 1 to 5, using the scale below. Justify your rating in 2–3 sentences.\n\nScoring Scale:\n1 - Inconsistent indentation, naming, or formatting.\n3 - Mostly consistent, but with some violations.\n5 - Fully consistent; adheres to standard style guides (e.g., PEP8).\n\nCODE:\n```{language}\n{code}\n```\n\nReturn your response as a valid JSON object in the following format:\n{{\"trait\": \"{trait}\",\n\"rating\": <1-5 integer>,\n\"justification\": \"<brief explanation>\"\n}}"
+  }
+}
+  

@@ -1,0 +1,7 @@
+name: metab
+channels:
+  - defaults
+dependencies:
+  - openai
+  - pyarrow
+prefix: /home/owly/miniconda3/envs/metab

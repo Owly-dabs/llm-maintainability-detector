@@ -1,0 +1,7 @@
+# Ignore all files in the examples directory
+example_outputs/*
+examples/*
+.clj-kondo
+.ruff_cache
+.lsp
+ruff*
