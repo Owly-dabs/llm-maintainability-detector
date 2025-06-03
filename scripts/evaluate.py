@@ -33,6 +33,25 @@ def evaluate_code(trait, language, code, model="gpt-4"):
     temperature=0)
     return response.choices[0].message.content
 
+def load_prompt_template(path="prompts/single_prompt.txt"):
+    with open(path, "r") as f:
+        return f.read()
+
+def evaluate_all_traits(language, code, model="gpt-4o"): 
+    prompt_template = load_prompt_template()
+    prompt = prompt_template.format(language=language, code=code)
+
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "You are a code maintainability evaluator."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0
+    )
+
+    return response.choices[0].message.content 
+
 # CLI support
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate code maintainability")

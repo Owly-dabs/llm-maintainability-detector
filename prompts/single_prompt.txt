@@ -1,0 +1,25 @@
+You are a senior software engineer evaluating the maintainability of the following {language} code.
+
+Please rate the code on a scale of 1 to 5 for the following traits:
+- Readability
+- Modularity
+- Simplicity
+- Documentation
+- Style Consistency
+
+Use the scale below:
+1 = Very poor, 3 = Moderate, 5 = Excellent
+
+CODE:
+```{language}
+{code}
+```
+
+Return your response in the following JSON format:
+{{
+  \"readability\": {{ \"rating\": <int>, \"justification\": \"<text>\" }},
+  \"modularity\": {{ \"rating\": <int>, \"justification\": \"<text>\" }},
+  ...
+}}
+
+Only return the JSON object. Do not include any commentary.

@@ -10,6 +10,7 @@ def map_severity(rating):
 def parse_response(response_str, trait):
     try:
         data = json.loads(response_str.strip("`json\n"))
+        
         if data.get("trait") != trait:
             data["trait"] = trait  # fallback correction if trait is missing
         return data
@@ -35,3 +36,26 @@ def build_issues_from_responses(responses):
             }
             issues.append(issue)
     return issues
+
+def build_issues_from_single_response(response_str):
+    try:
+        issues = []
+        data = json.loads(response_str.strip("`json\n"))
+        for trait in data:
+            if not data[trait]:
+                continue
+            rating = data[trait].get("rating")
+            justification = data[trait].get("justification")
+
+            if rating is not None and rating < 3:
+                issue = {
+                    "Category Name": "Maintainability",
+                    "Short Description": f"{trait.capitalize()} issue",
+                    "Long Description": justification,
+                    "Severity/Impact level": map_severity(rating)
+                }
+                issues.append(issue)
+        return issues
+    except json.JSONDecodeError:
+        print(f"⚠️ Could not parse LLM response.")
+        return None

@@ -4,32 +4,20 @@ from scripts import evaluate, process_traits as pt
 import json
 
 def main():
-    traits = [
-        "readability",
-        "modularity",
-        "simplicity",
-        "documentation",
-        "style_consistency"
-    ]
-    code_file = "depr_example_code4.py"
-    language = "python"
-    model = "gpt-4o"
-
-    with open(f"examples/{code_file}") as f:
+    CODE_FILE = "example_code3.py"
+    
+    with open(f"examples/{CODE_FILE}") as f:
         code = f.read()
+        
+    traits_response = evaluate.evaluate_all_traits(
+        language="python", # TODO: make this dynamic
+        code=code,
+        model="gpt-4o"
+    )
+    
+    issues = pt.build_issues_from_single_response(traits_response)
 
-    raw_responses = []
-
-    for trait in traits:
-        print(f"Evaluating {trait}...")
-        result_str = evaluate.evaluate_code(trait, language, code, model)
-        print(f"\n--- {trait.capitalize()} Evaluation ---\n{result_str}\n")
-        parsed = pt.parse_response(result_str, trait)
-        raw_responses.append(parsed)
-
-    issues = pt.build_issues_from_responses(raw_responses)
-
-    with open(f"example_outputs/{code_file}.json", "w") as out:
+    with open(f"example_outputs/{CODE_FILE}.json", "w") as out:
         json.dump(issues, out, indent=2)
         print(f"\n✅ Saved {len(issues)} issue(s) to issues_output.json")
 

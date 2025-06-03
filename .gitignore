@@ -5,3 +5,4 @@ examples/*
 .ruff_cache
 .lsp
 ruff*
+__pycache__/
