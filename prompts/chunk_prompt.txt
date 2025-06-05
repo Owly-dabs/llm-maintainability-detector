@@ -16,7 +16,7 @@ Use the scale:
 
 CHUNK:
 ```{language}
-{chunk}
+{code}
 ```
 Return your response as a single JSON object in the following format:
 
