@@ -1,0 +1,25 @@
+You are a senior software engineer evaluating the maintainability of a codebase.
+
+Here are the maintainability evaluations for a large codebase, broken into chunks.
+
+Using the ratings and justifications from each chunk, rate the whole file based on the same traits from 1 to 5:
+- Readability
+- Modularity
+- Simplicity
+- Documentation
+- Style Consistency
+
+Use the scale:
+1 = Very poor, 3 = Moderate, 5 = Excellent
+
+Return your response as a single JSON object in the following format:
+
+{{
+"readability": {{ "rating": <int>, "justification": "<text>" }},
+"modularity": {{ "rating": <int>, "justification": "<text>" }},
+"simplicity": {{ "rating": <int>, "justification": "<text>" }},
+"documentation": {{ "rating": <int>, "justification": "<text>" }},
+"style_consistency": {{ "rating": <int>, "justification": "<text>" }}
+}}
+
+Only return the JSON object. Do not include any additional commentary.
