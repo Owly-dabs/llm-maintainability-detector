@@ -2,6 +2,8 @@ You are a senior software engineer evaluating the maintainability of a codebase.
 
 Here are the maintainability evaluations for a large codebase, broken into chunks.
 
+$evaluation_history
+
 Using the ratings and justifications from each chunk, rate the whole file based on the same traits from 1 to 5:
 - Readability
 - Modularity
@@ -11,6 +13,8 @@ Using the ratings and justifications from each chunk, rate the whole file based 
 
 Use the scale:
 1 = Very poor, 3 = Moderate, 5 = Excellent
+
+Focus on common patterns and notable exceptions across all chunks. If a trait varies significantly, explain the reasoning in your justification.
 
 Return your response as a single JSON object in the following format:
 

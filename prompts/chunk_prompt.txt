@@ -1,8 +1,8 @@
-You are a senior software engineer evaluating the maintainability of a {language} codebase.
+You are a senior software engineer evaluating the maintainability of a $language codebase.
 
 Below are evaluations from previous chunks to provide context:
 
-{evaluation_history}
+$evaluation_history
 
 Now, evaluate the following chunk of code. Rate each trait from 1 to 5:
 - Readability
@@ -15,8 +15,8 @@ Use the scale:
 1 = Very poor, 3 = Moderate, 5 = Excellent
 
 CHUNK:
-```{language}
-{code}
+```$language
+$code
 ```
 Return your response as a single JSON object in the following format:
 
