@@ -1,4 +1,5 @@
 from openai import OpenAI
+from string import Template
 import os
 import sys 
 # Add parent directory to sys.path
@@ -30,9 +31,9 @@ def load_prompt_template(path="prompts/single_prompt.txt"):
     with open(path, "r") as f:
         return f.read()
 
-def evaluate_all_traits(language, code, model="gpt-4o"): 
-    prompt_template = load_prompt_template()
-    prompt = prompt_template.format(language=language, code=code)
+def evaluate_all_traits(language, code, prompt_template:str, model="gpt-4o"): 
+    #prompt = prompt_template.format(language=language, code=code)
+    prompt = Template(prompt_template).substitute(language=language, code=code)
 
     response = client.chat.completions.create(
         model=model,
@@ -45,6 +46,53 @@ def evaluate_all_traits(language, code, model="gpt-4o"):
 
     return response.choices[0].message.content 
 
+def summarize_evaluation_history(evaluation_history, prompt_template, model="gpt-4o"):
+    """
+    Summarize the evaluation history and return a single JSON object of 5 traits 
+    and their respective ratings and justifications.
+    """
+    # prompt = prompt_template.format(evaluation_history=evaluation_history)
+    prompt = Template(prompt_template).substitute(evaluation_history=evaluation_history)
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "You are a code maintainability evaluator."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0
+    )
+    return response.choices[0].message.content.strip()
+
+def evaluate_chunks(language, code_chunks, prompt_template:str, model="gpt-4o"):
+    """
+    Evaluate multiple code chunks for maintainability traits.
+    """
+    evaluation_history = "" # No evaluation history on first chunk
+
+    for chunk in code_chunks:
+        code = chunk["content"].strip()
+        prompt = Template(prompt_template).substitute(
+            language=language,
+            code=code,
+            evaluation_history=evaluation_history
+        )
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "You are a code maintainability evaluator."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0
+        )
+        evaluation_history += f"\n\nChunk {chunk['id']}:\n{response.choices[0].message.content.strip()}"
+    
+    # Return the final evaluation history
+    return summarize_evaluation_history(
+        evaluation_history,
+        prompt_template=load_prompt_template("prompts/summarize_prompt.txt"),
+        model=model
+    )
+
 # CLI support
 if __name__ == "__main__":
     import argparse
@@ -54,6 +102,7 @@ if __name__ == "__main__":
     parser.add_argument("--language", default="python", help="Programming language of the code")
     parser.add_argument("--model", default="gpt-4o", help="OpenAI model to use")
     parser.add_argument("--output", default=None, help="Optional path to save output JSON")
+    parser.add_argument("--chunk", action="store_true", help="Evaluate code in chunks instead of all at once")
     args = parser.parse_args()
 
     with open(args.code_file) as f:
