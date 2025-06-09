@@ -6,3 +6,4 @@ examples/*
 .lsp
 ruff*
 __pycache__/
+.vscode/
