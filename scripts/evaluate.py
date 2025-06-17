@@ -7,6 +7,7 @@ from models.datatypes import Chunk
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
     
 from scripts.llm_setup import set_openAI  # Import the function to set up OpenAI client
+from utils.logger import logger
 
 client = set_openAI(local=False)
 
@@ -32,37 +33,37 @@ def load_prompt_template(path="prompts/single_prompt.txt"):
     with open(path, "r") as f:
         return f.read()
 
-def evaluate_all_traits(language, code, prompt_template:str, model="gpt-4o"): 
-    #prompt = prompt_template.format(language=language, code=code)
+def run_chat_completion(prompt: str, model: str = "gpt-4o", context: str = "unknown", system_msg: str = "You are a code maintainability evaluator.") -> str | None:
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.error(f"❌ [{context}] Chat completion error: {e}")
+        return None
+
+
+def evaluate_all_traits(language, code, prompt_template: str, model="gpt-4o"): 
+    """
+    Evaluate a single string of code for maintainability traits using LLM.
+    """
     prompt = Template(prompt_template).substitute(language=language, code=code)
+    return run_chat_completion(prompt, model=model, context="evaluate_all_traits")
 
-    response = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": "You are a code maintainability evaluator."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0
-    )
-
-    return response.choices[0].message.content 
 
 def summarize_evaluation_history(evaluation_history, prompt_template, model="gpt-4o"):
     """
-    Summarize the evaluation history and return a single JSON object of 5 traits 
-    and their respective ratings and justifications.
+    Summarize the evaluation history using LLM.
     """
-    # prompt = prompt_template.format(evaluation_history=evaluation_history)
     prompt = Template(prompt_template).substitute(evaluation_history=evaluation_history)
-    response = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": "You are a code maintainability evaluator."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0
-    )
-    return response.choices[0].message.content.strip()
+    return run_chat_completion(prompt, model=model, context="summarize_evaluation_history")
+
 
 def evaluate_chunks(language: str, code_chunks: list[Chunk], prompt_template: str, model: str = "gpt-4o") -> str:
     """
@@ -77,30 +78,19 @@ def evaluate_chunks(language: str, code_chunks: list[Chunk], prompt_template: st
     Returns:
         str: Summarized evaluation across all chunks.
     """
-    evaluation_history = ""  # No evaluation history on the first chunk
+    evaluation_history = ""
 
     for chunk in code_chunks:
-        code = chunk.content.strip()  # Access attribute directly from Chunk
         prompt = Template(prompt_template).substitute(
             language=language,
-            code=code,
+            code=chunk.content.strip(),
             evaluation_history=evaluation_history
         )
-
-        try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "system", "content": "You are a code maintainability evaluator."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0
-            )
-            chunk_evaluation = response.choices[0].message.content.strip()
-            evaluation_history += f"\n\nChunk {chunk.id}:\n{chunk_evaluation}"
-        except Exception as e:
-            print(f"❌ Error evaluating chunk {chunk.id}: {e}")
-            continue
+        result = run_chat_completion(prompt, model=model, context=f"evaluate_chunks - Chunk {chunk.id}")
+        if result:
+            evaluation_history += f"\n\nChunk {chunk.id}:\n{result}"
+        else:
+            logger.warning(f"⚠️ Skipping chunk {chunk.id} due to failed evaluation.")
 
     return summarize_evaluation_history(
         evaluation_history,
@@ -125,12 +115,11 @@ if __name__ == "__main__":
 
     try:
         result_json = evaluate_all_traits(args.language, code, args.model)
-        print("\n✅ Evaluation Result:")
-        print(result_json)
+        logger.info(f"\n✅ Evaluation Result:\n{result_json}\n")
 
         if args.output:
             with open(args.output, "w") as out_file:
                 out_file.write(result_json)
-            print(f"\n📝 Output saved to {args.output}")
+            logger.info(f"\n📝 Output saved to {args.output}")
     except Exception as e:
-        print(f"\n❌ Error during evaluation: {e}")
+        logger.error(f"\n❌ Error during evaluation: {e}")

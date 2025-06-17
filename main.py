@@ -1,5 +1,6 @@
 # Import functions from other files
 from scripts import evaluate, process_traits as pt, chunk
+from utils.logger import logger
 
 import json
 import argparse
@@ -15,10 +16,10 @@ def get_issues_adaptive_chunking(code_file) -> list:
 
     should_chunk = chunk.should_chunk(code)
     if should_chunk:
-        print("Large file detected. Splitting code into chunks...")
+        logger.info("Large file detected. Splitting code into chunks...")
         return get_issues_with_chunks(code_file)
     else:
-        print("Evaluating code as a single prompt...")
+        logger.info("Evaluating code as a single prompt...")
         return get_issues_single_prompt(code_file)
 
 #TODO: logging instead of printing, it should be the first thing u do. Config logging first
@@ -35,6 +36,8 @@ def get_issues_single_prompt(code_file) -> list:
         prompt_template=evaluate.load_prompt_template(),
         model="gpt-4o"
     )
+
+    logger.debug(f"Traits response: {traits_response}")
     
     return pt.build_issues_from_single_response(traits_response)
     
@@ -51,11 +54,14 @@ def get_issues_with_chunks(code_file) -> list:
         prompt_template=evaluate.load_prompt_template("prompts/chunk_prompt.txt"),
         model="gpt-4o"
     )
+
+    logger.debug(f"Traits response: {traits_response}")
    
     return pt.build_issues_from_single_response(traits_response)
 
 def main():
-
+    logger.setLevel("DEBUG") # Comment for production use
+    
     parser = argparse.ArgumentParser(description="Evaluate code traits.")
     parser.add_argument("code_file", help="The code file to evaluate")
 
@@ -67,29 +73,31 @@ def main():
     CODE_FILE = args.code_file
 
     if args.chunk:
-        print("⚙️ Forced chunking mode enabled...")
+        logger.info("⚙️ Forced chunking mode enabled...")
         issues = get_issues_with_chunks(CODE_FILE)
     elif args.no_chunk:
-        print("⚙️ Forced single-prompt mode enabled...")
+        logger.info("⚙️ Forced single-prompt mode enabled...")
         issues = get_issues_single_prompt(CODE_FILE)
     else:
         issues = get_issues_adaptive_chunking(CODE_FILE)
 
     # Output issues to json file
     filename = CODE_FILE.split("/")[-1].split(".")[0]
-    with open(f"example_outputs/{filename}.json", "w") as out:
+    output_path = f"example_outputs/{filename}.json"
+    with open(output_path, "w") as out:
         issues_dicts = [issue.model_dump() for issue in issues]
         json.dump(issues_dicts, out, indent=2)
-        print(f"\n✅ Saved {len(issues)} issue(s) to example_output/{filename}.json")
+        logger.info(f"✅ Saved {len(issues)} issue(s) to {output_path}")
 
 def main_test():
     CODE_FILE = "examples/example_code5.py"
     issues = get_issues_with_chunks(CODE_FILE)
     
     filename = CODE_FILE.split("/")[-1].split(".")[0]
-    with open(f"example_outputs/{filename}.json", "w") as out:
+    output_path = f"example_outputs/{filename}.json"
+    with open(output_path, "w") as out:
         json.dump(issues, out, indent=2)
-        print(f"\n✅ Saved {len(issues)} issue(s) to example_output/{filename}.json")
+        logger.info(f"✅ Saved {len(issues)} issue(s) to {output_path}")
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

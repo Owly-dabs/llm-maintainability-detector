@@ -1,4 +1,5 @@
 from models.datatypes import Chunk
+from utils.logger import logger
 
 CHUNKING_LINE_THRESHOLD = 400
 CHUNK_MAX_LINES = 140
@@ -7,8 +8,6 @@ CHUNK_MIN_LINES = 60
 def should_chunk(code: str) -> bool:
     """Return True if code exceeds the chunking threshold."""
     return len(code.splitlines()) >= CHUNKING_LINE_THRESHOLD
-
-#TODO: dataclasses
 
 #TODO: identify language from file extension or content
 #TODO: add support for curly braces languages
@@ -85,21 +84,18 @@ if __name__ == "__main__":
     # chunk_file(args.code_file, args.output)
     with open(args.code_file) as f:
         code = f.read()
-
-    if should_chunk(code):
-        print("📦 Chunking code...")
-        chunks = chunk_code_by_structure(code)
-        for chunk in chunks:
-            print(f"\n--- Chunk {chunk['id'] + 1} ({chunk['lines']}) ---\n")
-            print(chunk['content'][:500])
-            print("\n... (truncated for display)")
-        
-        if args.output:
-            with open(args.output, "w") as out_file:
-                for chunk in chunks:
-                    out_file.write(f"--- Chunk {chunk['id'] + 1} ({chunk['lines']}) ---\n")
-                    out_file.write(chunk['content'] + "\n\n")
-            print(f"\n📝 Output saved to {args.output}")
-    else:
-        print("✅ Code is short enough for full evaluation.")
+        if should_chunk(code):
+            logger.info("📦 Chunking code...")
+            chunks = chunk_code_by_structure(code)
+            for chunk in chunks:
+                logger.info(f"\n--- Chunk {chunk.id + 1} ({chunk.lines}) ---\n{chunk.content[:500]}\n... (truncated for display)")
+            
+            if args.output:
+                with open(args.output, "w") as out_file:
+                    for chunk in chunks:
+                        out_file.write(f"--- Chunk {chunk.id + 1} ({chunk.lines}) ---\n")
+                        out_file.write(chunk.content + "\n\n")
+                logger.info(f"\n📝 Output saved to {args.output}")
+        else:
+            logger.info("✅ Code is short enough for full evaluation.")
 

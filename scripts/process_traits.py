@@ -1,6 +1,8 @@
 import json
-from models.datatypes import Issue, CodeEval
 from pydantic import ValidationError
+
+from models.datatypes import Issue, CodeEval
+from utils.logger import logger
 
 def map_severity(rating):
     if rating == 2:
@@ -30,8 +32,8 @@ def build_issues_from_single_response(response_str):
                 issues.append(issue)
         return issues
     except ValidationError as e:
-        print("Validation failed:", e)
+        logger.error("Validation failed:", e)
         return None
     except json.JSONDecodeError:
-        print(f"⚠️ Could not parse LLM response. Run evaluate.py to see response.")
+        logger.error(f"⚠️ Could not parse LLM response. Run evaluate.py to see response.")
         return None
