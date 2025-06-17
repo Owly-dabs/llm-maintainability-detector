@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-def set_openAI(local=False) -> OpenAI:
+def set_openai(local: bool = False) -> OpenAI:
     
     if local:
         return OpenAI(

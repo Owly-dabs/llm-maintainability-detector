@@ -1,6 +1,7 @@
 # Import functions from other files
 from scripts import evaluate, process_traits as pt, chunk
 from utils.logger import logger
+from models.datatypes import Issue
 
 import json
 import argparse
@@ -10,7 +11,7 @@ def get_code_from_file(code_file: str) -> str:
     with open(code_file, 'r') as f:
         return f.read()
     
-def get_issues_adaptive_chunking(code_file) -> list:
+def get_issues_adaptive_chunking(code_file: str) -> list[Issue]:
     """Get issues from a code file by evaluating its traits with adaptive chunking."""
     code = get_code_from_file(code_file)
 
@@ -25,7 +26,7 @@ def get_issues_adaptive_chunking(code_file) -> list:
 #TODO: logging instead of printing, it should be the first thing u do. Config logging first
 #TODO: Figure out uv and use pyproject.toml for dependencies -- find out what a lock file is and hwo to use it
 
-def get_issues_single_prompt(code_file) -> list:
+def get_issues_single_prompt(code_file: str) -> list[Issue]:
     """Get issues from a code file by evaluating its traits."""
     code = get_code_from_file(code_file)
     language = evaluate.detect_language_from_filename(code_file)
@@ -41,7 +42,7 @@ def get_issues_single_prompt(code_file) -> list:
     
     return pt.build_issues_from_single_response(traits_response)
     
-def get_issues_with_chunks(code_file) -> list:
+def get_issues_with_chunks(code_file: str) -> list[Issue]:
     """Get issues from a list of code chunks by evaluating their traits."""
     code = get_code_from_file(code_file)
     language = evaluate.detect_language_from_filename(code_file)

@@ -11,7 +11,7 @@ from utils.logger import logger
 
 client = set_openAI(local=False)
 
-def detect_language_from_filename(filename):
+def detect_language_from_filename(filename: str) -> str:
     ext = os.path.splitext(filename)[1].lower()
     return {
         ".py": "python",
@@ -49,7 +49,7 @@ def run_chat_completion(prompt: str, model: str = "gpt-4o", context: str = "unkn
         return None
 
 
-def evaluate_all_traits(language, code, prompt_template: str, model="gpt-4o"): 
+def evaluate_all_traits(language: str, code: str, prompt_template: str, model="gpt-4o") -> str | None: 
     """
     Evaluate a single string of code for maintainability traits using LLM.
     """
@@ -57,7 +57,7 @@ def evaluate_all_traits(language, code, prompt_template: str, model="gpt-4o"):
     return run_chat_completion(prompt, model=model, context="evaluate_all_traits")
 
 
-def summarize_evaluation_history(evaluation_history, prompt_template, model="gpt-4o"):
+def summarize_evaluation_history(evaluation_history: str, prompt_template: str, model="gpt-4o") -> str | None:
     """
     Summarize the evaluation history using LLM.
     """
@@ -65,7 +65,7 @@ def summarize_evaluation_history(evaluation_history, prompt_template, model="gpt
     return run_chat_completion(prompt, model=model, context="summarize_evaluation_history")
 
 
-def evaluate_chunks(language: str, code_chunks: list[Chunk], prompt_template: str, model: str = "gpt-4o") -> str:
+def evaluate_chunks(language: str, code_chunks: list[Chunk], prompt_template: str, model: str = "gpt-4o") -> str | None:
     """
     Evaluate multiple code chunks for maintainability traits using LLM.
 

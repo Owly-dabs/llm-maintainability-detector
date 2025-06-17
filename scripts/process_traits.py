@@ -4,14 +4,14 @@ from pydantic import ValidationError
 from models.datatypes import Issue, CodeEval
 from utils.logger import logger
 
-def map_severity(rating):
+def map_severity(rating: int) -> str | None:
     if rating == 2:
         return "Low"
     elif rating == 1:
         return "Medium"
     return None
 
-def build_issues_from_single_response(response_str):
+def build_issues_from_single_response(response_str: str) -> list[Issue] | None:
     try:
         issues = []
         data = json.loads(response_str.strip("`json\n"))
