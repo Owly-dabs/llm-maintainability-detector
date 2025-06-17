@@ -61,7 +61,7 @@ def get_issues_with_chunks(code_file: str) -> list[Issue]:
     return pt.build_issues_from_single_response(traits_response)
 
 def main():
-    logger.setLevel("DEBUG") # Comment for production use
+    # logger.setLevel("DEBUG") # Comment for production use
     
     parser = argparse.ArgumentParser(description="Evaluate code traits.")
     parser.add_argument("code_file", help="The code file to evaluate")
