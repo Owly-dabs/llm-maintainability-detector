@@ -1,0 +1,9 @@
+[project]
+name = "llm-maintainability-detection"
+version = "3.0"
+description = "A Python package for maintainability evaluation using LLM"
+dependencies = [
+    "openai",
+    "pydantic",
+    "dotenv",
+]
