@@ -1,5 +1,4 @@
-import os
-from typing import List, Dict
+from models.datatypes import Chunk
 
 CHUNKING_LINE_THRESHOLD = 400
 CHUNK_MAX_LINES = 140
@@ -9,6 +8,11 @@ def should_chunk(code: str) -> bool:
     """Return True if code exceeds the chunking threshold."""
     return len(code.splitlines()) >= CHUNKING_LINE_THRESHOLD
 
+#TODO: dataclasses
+
+#TODO: identify language from file extension or content
+#TODO: add support for curly braces languages
+#TODO: add support for indentation (char 0 is not a whitespace character in Python) (more repeatable way for other languages)
 def is_split_point(line: str) -> bool:
     """Heuristic rules for splitting based on code structure."""
     trimmed = line.strip()
@@ -20,17 +24,19 @@ def is_split_point(line: str) -> bool:
         trimmed.startswith("/*") or
         trimmed == ""
     )
+    
+    #TODO: add types for functions
 
-def chunk_code_by_structure(code: str) -> List[Dict]:
+def chunk_code_by_structure(code: str) -> list[Chunk]:
     """
     Chunk code using simple structural heuristics (functions, classes, comments, blank lines).
     Ensures each chunk is between CHUNK_MIN_LINES and CHUNK_MAX_LINES.
 
     Returns:
-        List[Dict]: Each dictionary contains 'id', 'lines', and 'content'.
+        list[Chunk]: Each chunk has an id, line range, and content.
     """
     lines = code.splitlines()
-    chunks = []
+    chunks: list[Chunk] = []
     current_chunk = []
     start_line = 0
 
@@ -39,11 +45,12 @@ def chunk_code_by_structure(code: str) -> List[Dict]:
         if len(current_chunk) >= CHUNK_MAX_LINES or is_split_point(line):
             if len(current_chunk) >= CHUNK_MIN_LINES:
                 end_line = idx + 1
-                chunks.append({
-                    "id": len(chunks),
-                    "lines": f"{start_line + 1}-{end_line}",
-                    "content": "\n".join(current_chunk)
-                })
+                chunk = Chunk(
+                    id=len(chunks),
+                    lines=f"{start_line + 1}-{end_line}",
+                    content="\n".join(current_chunk)
+                )
+                chunks.append(chunk)
                 current_chunk = []
                 start_line = idx + 1
 
@@ -51,16 +58,21 @@ def chunk_code_by_structure(code: str) -> List[Dict]:
         end_line = len(lines)
         if chunks and len(current_chunk) < CHUNK_MIN_LINES:
             # Merge with previous chunk if it's small
-            chunks[-1]["content"] += "\n" + "\n".join(current_chunk)
-            chunks[-1]["lines"] = f"{chunks[-1]['lines'].split('-')[0]}-{end_line}"
+            prev_chunk = chunks[-1]
+            prev_chunk.content += "\n" + "\n".join(current_chunk)
+            prev_chunk.lines = f"{prev_chunk.lines.split('-')[0]}-{end_line}"
         else:
-            chunks.append({
-                "id": len(chunks),
-                "lines": f"{start_line + 1}-{end_line}",
-                "content": "\n".join(current_chunk)
-            })
+            chunk = Chunk(
+                id=len(chunks),
+                lines=f"{start_line + 1}-{end_line}",
+                content="\n".join(current_chunk)
+            )
+            chunks.append(chunk)
 
     return chunks
+
+def chunk_file(file_content: str, output_file: None | str) -> str:
+    pass
 
 if __name__ == "__main__":
     import argparse
@@ -70,6 +82,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", default=None, help="Optional path to save chunked output")
     args = parser.parse_args()
 
+    # chunk_file(args.code_file, args.output)
     with open(args.code_file) as f:
         code = f.read()
 

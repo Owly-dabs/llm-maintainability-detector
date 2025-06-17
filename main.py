@@ -21,6 +21,9 @@ def get_issues_adaptive_chunking(code_file) -> list:
         print("Evaluating code as a single prompt...")
         return get_issues_single_prompt(code_file)
 
+#TODO: logging instead of printing, it should be the first thing u do. Config logging first
+#TODO: Figure out uv and use pyproject.toml for dependencies -- find out what a lock file is and hwo to use it
+
 def get_issues_single_prompt(code_file) -> list:
     """Get issues from a code file by evaluating its traits."""
     code = get_code_from_file(code_file)
@@ -52,6 +55,7 @@ def get_issues_with_chunks(code_file) -> list:
     return pt.build_issues_from_single_response(traits_response)
 
 def main():
+
     parser = argparse.ArgumentParser(description="Evaluate code traits.")
     parser.add_argument("code_file", help="The code file to evaluate")
 
@@ -74,7 +78,8 @@ def main():
     # Output issues to json file
     filename = CODE_FILE.split("/")[-1].split(".")[0]
     with open(f"example_outputs/{filename}.json", "w") as out:
-        json.dump(issues, out, indent=2)
+        issues_dicts = [issue.model_dump() for issue in issues]
+        json.dump(issues_dicts, out, indent=2)
         print(f"\n✅ Saved {len(issues)} issue(s) to example_output/{filename}.json")
 
 def main_test():

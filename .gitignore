@@ -7,3 +7,4 @@ examples/*
 ruff*
 __pycache__/
 .vscode/
+.env

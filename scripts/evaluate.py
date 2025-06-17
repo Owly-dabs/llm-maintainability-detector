@@ -2,6 +2,7 @@ from openai import OpenAI
 from string import Template
 import os
 import sys 
+from models.datatypes import Chunk
 # Add parent directory to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
     
@@ -63,30 +64,44 @@ def summarize_evaluation_history(evaluation_history, prompt_template, model="gpt
     )
     return response.choices[0].message.content.strip()
 
-def evaluate_chunks(language, code_chunks, prompt_template:str, model="gpt-4o"):
+def evaluate_chunks(language: str, code_chunks: list[Chunk], prompt_template: str, model: str = "gpt-4o") -> str:
     """
-    Evaluate multiple code chunks for maintainability traits.
+    Evaluate multiple code chunks for maintainability traits using LLM.
+
+    Args:
+        language (str): Programming language of the code.
+        code_chunks (List[Chunk]): List of code chunks to evaluate.
+        prompt_template (str): Prompt template for individual chunk evaluation.
+        model (str): LLM model name (default: "gpt-4o").
+
+    Returns:
+        str: Summarized evaluation across all chunks.
     """
-    evaluation_history = "" # No evaluation history on first chunk
+    evaluation_history = ""  # No evaluation history on the first chunk
 
     for chunk in code_chunks:
-        code = chunk["content"].strip()
+        code = chunk.content.strip()  # Access attribute directly from Chunk
         prompt = Template(prompt_template).substitute(
             language=language,
             code=code,
             evaluation_history=evaluation_history
         )
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": "You are a code maintainability evaluator."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0
-        )
-        evaluation_history += f"\n\nChunk {chunk['id']}:\n{response.choices[0].message.content.strip()}"
-    
-    # Return the final evaluation history
+
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": "You are a code maintainability evaluator."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0
+            )
+            chunk_evaluation = response.choices[0].message.content.strip()
+            evaluation_history += f"\n\nChunk {chunk.id}:\n{chunk_evaluation}"
+        except Exception as e:
+            print(f"❌ Error evaluating chunk {chunk.id}: {e}")
+            continue
+
     return summarize_evaluation_history(
         evaluation_history,
         prompt_template=load_prompt_template("prompts/summarize_prompt.txt"),
