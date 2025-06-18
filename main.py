@@ -29,7 +29,7 @@ def get_issues_adaptive_chunking(code_file: str) -> list[Issue]:
 def get_issues_single_prompt(code_file: str) -> list[Issue]:
     """Get issues from a code file by evaluating its traits."""
     code = get_code_from_file(code_file)
-    language = evaluate.detect_language_from_filename(code_file)
+    language = chunk.detect_language_from_filename(code_file)
         
     traits_response = evaluate.evaluate_all_traits(
         language=language, 
@@ -45,9 +45,9 @@ def get_issues_single_prompt(code_file: str) -> list[Issue]:
 def get_issues_with_chunks(code_file: str) -> list[Issue]:
     """Get issues from a list of code chunks by evaluating their traits."""
     code = get_code_from_file(code_file)
-    language = evaluate.detect_language_from_filename(code_file)
+    language = chunk.detect_language_from_filename(code_file)
 
-    code_chunks = chunk.chunk_code_by_structure(code)
+    code_chunks = chunk.chunk_code_by_structure(code, language)
 
     traits_response = evaluate.evaluate_chunks(
         language=language, 
